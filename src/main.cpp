@@ -5,14 +5,30 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
+
+// цвет фона
+static sf::Color bgColor;
+// значение цвета по умолчанию
+float color[3] = {0.12f, 0.12f, 0.13f};
+
+// задать цвет фона по вещественному массиву компонент
+static void setColor(float * pDouble){
+    bgColor.r = static_cast<sf::Uint8>(pDouble[0] * 255.f);
+    bgColor.g = static_cast<sf::Uint8>(pDouble[1] * 255.f);
+    bgColor.b = static_cast<sf::Uint8>(pDouble[2] * 255.f);
+}
+
 // главный метод
 int main() {
     // создаём окно для рисования
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "ImGui + SFML = <3");
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Geometry Project 10");
     // задаём частоту перерисовки окна
     window.setFramerateLimit(60);
     // инициализация imgui+sfml
     ImGui::SFML::Init(window);
+
+    // задаём цвет фона
+    setColor(color);
 
     // переменная таймера
     sf::Clock deltaClock;
@@ -35,11 +51,22 @@ int main() {
         // запускаем обновление окна по таймеру с заданной частотой
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        // рисуем демонстрационное окно
-        ImGui::ShowDemoWindow();
+
+        // создаём окно управления
+        ImGui::Begin("Control");
+
+        // Инструмент выбора цвета
+        if (ImGui::ColorEdit3("Background color", color)) {
+            // код вызывается при изменении значения
+            // задаём цвет фона
+            setColor(color);
+        }
+        // конец рисование окна
+        ImGui::End();
+
 
         // очищаем окно
-        window.clear();
+        window.clear(bgColor);
         // рисуем по окну средствами imgui+sfml
         ImGui::SFML::Render(window);
         // отображаем изменения на окне
