@@ -99,11 +99,27 @@ void RenderTask() {
 
     // перебираем точки из динамического массива точек
     for (auto point: points) {
+        ImColor clr;
+        // Устанавливаем цвет по номеру множества
+        switch (point.setNum) {
+            case SET_1:
+                clr = ImColor(200, 100, 150);
+                break;
+            case SET_2:
+                clr = ImColor(100, 200, 150);
+                break;
+            case SET_CROSSED:
+                clr = ImColor(100, 150, 200);
+                break;
+            case SET_SINGLE:
+                clr = ImColor(150, 200, 100);
+                break;
+        }
         // добавляем в список рисования круг
         pDrawList->AddCircleFilled(
                 sf::Vector2i(point.pos.x, point.pos.y),
                 3,
-                point.setNum == SET_1 ? ImColor(200, 100, 150) : ImColor(100, 200, 150),
+                clr,
                 20
         );
     }
@@ -244,6 +260,50 @@ void ShowFiles() {
     ImGui::PopID();
 }
 
+// решение задачи
+void solve() {
+    // у совпадающих по координатам точек меняем множество на SET_CROSSED
+    for (int i = 0; i < points.size(); i++)
+        for (int j = i + 1; j < points.size(); j++)
+            if (points[i].pos == points[j].pos)
+                points[i].setNum = points[j].setNum = SET_CROSSED;
+
+    // у всех точек, у которых множество не SET_CROSSED, задаём множество SET_SINGLE
+    for (auto &point: points)
+        if (point.setNum != SET_CROSSED)
+            point.setNum = SET_SINGLE;
+
+}
+
+// решение задачи
+void ShowSolve() {
+    // если не раскрыта панель `Solve`
+    if (!ImGui::CollapsingHeader("Solve"))
+        return;
+    // первый элемент в линии
+    ImGui::PushID(0);
+    // создаём кнопку решения
+    if (ImGui::Button("Solve")) {
+        solve();
+    }
+
+    // восстанавливаем буфер id
+    ImGui::PopID();
+
+    // следующий элемент будет на той же строчке
+    ImGui::SameLine();
+    // второй элемент
+    ImGui::PushID(1);
+
+    // создаём кнопку очистки
+    if (ImGui::Button("Clear")) {
+        // удаляем все точки
+        points.clear();
+    }
+    // восстанавливаем буфер id
+    ImGui::PopID();
+}
+
 // главный метод
 int main() {
     // создаём окно для рисования
@@ -310,6 +370,9 @@ int main() {
 
         // работа с файлами
         ShowFiles();
+
+        // решение задачи
+        ShowSolve();
 
         // конец рисования окна
         ImGui::End();
