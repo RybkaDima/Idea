@@ -52,8 +52,61 @@ struct Point {
     }
 };
 
+// Треугольник
+struct Triangle {
+    // положение
+    sf::Vector2i pos1;
+    sf::Vector2i pos2;
+    sf::Vector2i pos3;
+
+    // конструктор
+    Triangle(const sf::Vector2i &pos1_, const sf::Vector2i &pos2_, const sf::Vector2i &pos3_){
+        pos1=pos1_;pos2=pos2_;pos3=pos3_;
+    }
+    Triangle(){
+    }
+    static Triangle randomTriangle() {
+        return Triangle(sf::Vector2i(
+                             rand() % WINDOW_SIZE_X,
+                             rand() % WINDOW_SIZE_Y),
+                        sf::Vector2i(
+                                rand() % WINDOW_SIZE_X,
+                                rand() % WINDOW_SIZE_Y),
+                        sf::Vector2i(
+                                rand() % WINDOW_SIZE_X,
+                                rand() % WINDOW_SIZE_Y)
+        );
+    }
+
+};
+struct Angle {
+    // положение
+    sf::Vector2i pos1;
+    sf::Vector2i pos2;
+    sf::Vector2i pos3;
+
+    // конструктор
+    Angle(const sf::Vector2i &pos1_, const sf::Vector2i &pos2_, const sf::Vector2i &pos3_){
+        pos1=pos1_;pos2=pos2_;pos3=pos3_;
+    }
+    static Angle randomAngle() {
+        return Angle(sf::Vector2i(
+                                rand() % WINDOW_SIZE_X,
+                                rand() % WINDOW_SIZE_Y),
+                        sf::Vector2i(
+                                rand() % WINDOW_SIZE_X,
+                                rand() % WINDOW_SIZE_Y),
+                        sf::Vector2i(
+                                rand() % WINDOW_SIZE_X,
+                                rand() % WINDOW_SIZE_Y)
+        );
+    }
+
+};
 // динамический список точек
 std::vector<Point> points;
+std::vector<Triangle> triangles;
+std::vector<Angle> angles;
 
 // цвет фона
 static sf::Color bgColor;
@@ -121,6 +174,46 @@ void RenderTask() {
                 3,
                 clr,
                 20
+        );
+    }
+    for (auto triangle: triangles) {
+        ImColor clr;
+        // добавляем в список рисования круг
+        pDrawList->AddCircleFilled(
+                sf::Vector2i(triangle.pos1.x, triangle.pos1.y),
+                3,
+                clr,
+                20
+        );
+        pDrawList->AddCircleFilled(
+                sf::Vector2i(triangle.pos2.x, triangle.pos2.y),
+                3,
+                clr,
+                20
+        );
+        pDrawList->AddCircleFilled(
+                sf::Vector2i(triangle.pos3.x, triangle.pos3.y),
+                3,
+                clr,
+                20
+        );
+        pDrawList->AddLine(
+                sf::Vector2i(triangle.pos1.x, triangle.pos1.y),
+                sf::Vector2i(triangle.pos2.x, triangle.pos2.y),
+                3,
+                clr
+        );
+        pDrawList->AddLine(
+                sf::Vector2i(triangle.pos1.x, triangle.pos1.y),
+                sf::Vector2i(triangle.pos3.x, triangle.pos3.y),
+                3,
+                clr
+        );
+        pDrawList->AddLine(
+                sf::Vector2i(triangle.pos3.x, triangle.pos3.y),
+                sf::Vector2i(triangle.pos2.x, triangle.pos2.y),
+                3,
+                clr
         );
     }
     // заканчиваем рисование окна
@@ -312,7 +405,7 @@ void ShowHelp() {
     // первый заголовок
     ImGui::Text("ABOUT THIS DEMO:");
     // первый элемент списка
-    ImGui::BulletText("Author Ivanov Ivan 10-1");
+    ImGui::BulletText("Author Ivanov Michail 17-1");
     // второй элемент списка
     ImGui::BulletText("Powered by SFML+ImGui");
     // разделитель
@@ -344,6 +437,9 @@ int main() {
     // переменная таймера
     sf::Clock deltaClock;
     // пока окно открыто, запускаем бесконечный цикл
+    Triangle triangle;
+    triangle.randomTriangle();
+    triangles.push_back(triangle);
     while (window.isOpen()) {
         // создаём событие sfml
         sf::Event event;
